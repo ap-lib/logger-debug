@@ -1,0 +1,31 @@
+{
+  "name": "ap-lib/logger-debug",
+  "description": "",
+  "type": "library",
+  "homepage": "https://github.com/ap-lib/logger-debug",
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "authors": [
+    {
+      "name": "Anton Panfilov"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "AP\\Logger\\Dumper\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "AP\\Logger\\Dumper\\Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "php": "^8.3",
+    "ap-lib/logger": "dev-main"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "10.5.*"
+  }
+}
