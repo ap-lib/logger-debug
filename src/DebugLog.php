@@ -119,7 +119,9 @@ readonly class DebugLog implements AddInterface
                 );
             }
 
-            error_log(implode("\n", $message));
+            if ($this->add_to_error_log) {
+                error_log(implode("\n", $message));
+            }
         }
     }
 }
