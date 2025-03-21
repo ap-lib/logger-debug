@@ -53,8 +53,7 @@ readonly class DebugLog implements AddInterface
     {
     }
 
-    private
-    function formatTime(float $microtime): string
+    private function formatTime(float $microtime): string
     {
         $dt = DateTime::createFromFormat(
             'U.u',
@@ -85,8 +84,7 @@ readonly class DebugLog implements AddInterface
      *
      * @param Action $action The log action to be recorded
      */
-    public
-    function add(Action $action): void
+    public function add(Action $action): void
     {
         $time    = $this->formatTime($action->microtime);
         $level   = $action->level->name;
