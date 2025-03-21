@@ -24,9 +24,10 @@ use Throwable;
  * Typically, on Linux, the limit is around 1024 bytes for syslog.
  * If the message exceeds this limit, it may be truncated.
  */
-readonly class DebugLog implements AddInterface
+class DebugLog implements AddInterface
 {
-    private float $start;
+    readonly public float $start;
+    private ?Action       $prev_action = null;
 
     /**
      * Initializes the FileLog instance with optional configurations
@@ -41,20 +42,26 @@ readonly class DebugLog implements AddInterface
      * @param ?Closure|string|array $message_decorator Callable to modify the log message output
      *                                     Function signature: function(AP\Logger\Action $action): string
      * @param bool $show_prefix
+     * @param float|null $start_microtime
+     * @param string $session_separator
      */
     public function __construct(
-        public string                    $filename = "",
-        public bool                      $add_to_error_log = true,
-        public Level                     $log_level = Level::INFO,
-        public bool                      $print_context = true,
-        public bool                      $print_trace = false,
-        public ?string                   $timezone = null,
-        public string                    $date_format = "Y-m-d H:i:s.u",
-        public null|Closure|string|array $message_decorator = null,
-        public bool                      $show_prefix = true,
+        readonly public string                    $filename = "",
+        readonly public bool                      $add_to_error_log = true,
+        readonly public Level                     $log_level = Level::INFO,
+        readonly public bool                      $print_context = true,
+        readonly public bool                      $print_trace = false,
+        readonly public ?string                   $timezone = null,
+        readonly public string                    $date_format = "Y-m-d H:i:s.u",
+        readonly public null|Closure|string|array $message_decorator = null,
+        readonly public bool                      $show_prefix = true,
+        readonly public string                    $session_separator = "",
+        ?float                                    $start_microtime = null,
     )
     {
-        $this->start = microtime(true);
+        $this->start = is_null($start_microtime)
+            ? microtime(true)
+            : $start_microtime;
     }
 
     private function formatTime(float $microtime): string
@@ -90,11 +97,15 @@ readonly class DebugLog implements AddInterface
      */
     public function add(Action $action): void
     {
-        $time    = $this->formatTime($action->microtime);
-        $level   = $action->level->name;
+        $time  = $this->formatTime($action->microtime);
+        $level = $action->level->name;
 
         $message = is_callable($this->message_decorator)
-            ? (string)($this->message_decorator)($action, $this->start)
+            ? (string)($this->message_decorator)(
+                $action,
+                $this->prev_action,
+                $this->start
+            )
             : $action->message;
 
         $message = $this->show_prefix
@@ -120,6 +131,10 @@ readonly class DebugLog implements AddInterface
                 ) . "\n";
         }
 
+        if (!empty($this->session_separator)) {
+            $message = array_merge([$this->session_separator], $message);
+        }
+
         if ($action->level->value >= $this->log_level->value) {
             if (file_exists($this->filename)) {
                 file_put_contents(
@@ -133,5 +148,7 @@ readonly class DebugLog implements AddInterface
                 error_log(implode("\n", $message));
             }
         }
+
+        $this->prev_action = $action;
     }
 }
