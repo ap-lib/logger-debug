@@ -88,10 +88,11 @@ readonly class DebugLog implements AddInterface
     {
         $time    = $this->formatTime($action->microtime);
         $level   = $action->level->name;
-        $message = $action->message;
-        if (is_callable($this->message_decorator)) {
-            $message = (string)($this->message_decorator)($action);
-        }
+
+        $message = is_callable($this->message_decorator)
+            ? (string)($this->message_decorator)($action)
+            : $action->message;
+
         $message = $this->show_prefix
             ? ["$time $action->module::[$level] $message"]
             : [$message];
