@@ -26,6 +26,8 @@ use Throwable;
  */
 readonly class DebugLog implements AddInterface
 {
+    private float $start;
+
     /**
      * Initializes the FileLog instance with optional configurations
      *
@@ -38,6 +40,7 @@ readonly class DebugLog implements AddInterface
      * @param string $date_format Format for displaying timestamps
      * @param ?Closure|string|array $message_decorator Callable to modify the log message output
      *                                     Function signature: function(AP\Logger\Action $action): string
+     * @param bool $show_prefix
      */
     public function __construct(
         public string                    $filename = "",
@@ -51,6 +54,7 @@ readonly class DebugLog implements AddInterface
         public bool                      $show_prefix = true,
     )
     {
+        $this->start = microtime(true);
     }
 
     private function formatTime(float $microtime): string
@@ -90,7 +94,7 @@ readonly class DebugLog implements AddInterface
         $level   = $action->level->name;
 
         $message = is_callable($this->message_decorator)
-            ? (string)($this->message_decorator)($action)
+            ? (string)($this->message_decorator)($action, $this->start)
             : $action->message;
 
         $message = $this->show_prefix
