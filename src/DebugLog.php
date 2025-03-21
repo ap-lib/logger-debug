@@ -48,11 +48,13 @@ readonly class DebugLog implements AddInterface
         public ?string                   $timezone = null,
         public string                    $date_format = "Y-m-d H:i:s.u",
         public null|Closure|string|array $message_decorator = null,
+        public bool                      $show_prefix = true,
     )
     {
     }
 
-    private function formatTime(float $microtime): string
+    private
+    function formatTime(float $microtime): string
     {
         $dt = DateTime::createFromFormat(
             'U.u',
@@ -83,7 +85,8 @@ readonly class DebugLog implements AddInterface
      *
      * @param Action $action The log action to be recorded
      */
-    public function add(Action $action): void
+    public
+    function add(Action $action): void
     {
         $time    = $this->formatTime($action->microtime);
         $level   = $action->level->name;
@@ -91,7 +94,9 @@ readonly class DebugLog implements AddInterface
         if (is_callable($this->message_decorator)) {
             $message = (string)($this->message_decorator)($action);
         }
-        $message = ["$time $action->module::[$level] $message"];
+        if ($this->show_prefix) {
+            $message = ["$time $action->module::[$level] $message"];
+        }
 
         if ($this->print_context && count($action->context)) {
             $message[] = "  data:";
