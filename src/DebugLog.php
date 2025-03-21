@@ -39,6 +39,7 @@ readonly class DebugLog implements AddInterface
      */
     public function __construct(
         public string                    $filename = "",
+        public bool                      $add_to_error_log = true,
         public Level                     $log_level = Level::INFO,
         public bool                      $print_context = true,
         public bool                      $print_trace = false,
