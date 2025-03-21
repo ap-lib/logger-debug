@@ -131,7 +131,7 @@ class DebugLog implements AddInterface
                 ) . "\n";
         }
 
-        if (!empty($this->session_separator)) {
+        if (is_null($this->prev_action) && !empty($this->session_separator)) {
             $message = array_merge(
                 is_string($this->session_separator)
                     ? [$this->session_separator]
