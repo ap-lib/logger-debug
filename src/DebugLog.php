@@ -29,6 +29,8 @@ readonly class DebugLog implements AddInterface
     /**
      * Initializes the FileLog instance with optional configurations
      *
+     * @param string $filename
+     * @param bool $add_to_error_log
      * @param Level $log_level Minimum log level required for a message to be logged
      * @param bool $print_context Whether to include context data in the log output
      * @param bool $print_trace Whether to include stack trace information in the log output
