@@ -43,7 +43,7 @@ class DebugLog implements AddInterface
      *                                     Function signature: function(AP\Logger\Action $action): string
      * @param bool $show_prefix
      * @param float|null $start_microtime
-     * @param string $session_separator
+     * @param array|string $session_separator
      */
     public function __construct(
         readonly public string                    $filename = "",
@@ -55,7 +55,7 @@ class DebugLog implements AddInterface
         readonly public string                    $date_format = "Y-m-d H:i:s.u",
         readonly public null|Closure|string|array $message_decorator = null,
         readonly public bool                      $show_prefix = true,
-        readonly public string                    $session_separator = "",
+        readonly public string|array              $session_separator = "",
         ?float                                    $start_microtime = null,
     )
     {
@@ -132,7 +132,12 @@ class DebugLog implements AddInterface
         }
 
         if (!empty($this->session_separator)) {
-            $message = array_merge([$this->session_separator], $message);
+            $message = array_merge(
+                is_string($this->session_separator)
+                    ? [$this->session_separator]
+                    : $this->session_separator,
+                $message
+            );
         }
 
         if ($action->level->value >= $this->log_level->value) {
